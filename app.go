@@ -1,9 +1,9 @@
 package clio
 
 import (
+	"fmt"
 	"os"
 	"strings"
-	"fmt"
 )
 
 
@@ -44,7 +44,8 @@ func (app *App) AddCmd(
 }
 
 func (app *App) Run() {
-	for idx, arg := range os.Args {
+	args := os.Args
+	for idx, arg := range args {
 		if idx == 0 {
 			continue
 		}
@@ -59,7 +60,7 @@ func (app *App) Run() {
 				cmd = app.commands["help"]
 				cmd.run([]string{})
 			} else {
-				cmd.run(os.Args[idx + 1:])
+				cmd.run(args[idx + 1:])
 			}
 			break
 		}

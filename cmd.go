@@ -47,14 +47,13 @@ func (cmd *Command) run(args []string) {
 	runme := true
 	for idx, arg := range args {
 		if idx == 0 && !strings.Contains(arg, "--") {
-			cmd := cmd.commands[arg]
-			if cmd == nil {
-				cmd = cmd.commands["help"]
-				cmd.run([]string{})
+			cd := cmd.commands[arg]
+			if cd == nil {
+				cd = cmd.commands["help"]
+				cd.run([]string{})
 			} else {
-				cmd.run(args[idx + 1:])
+				cd.run(args[idx + 1:])
 			}
-			
 			runme = false
 			break
 		}
