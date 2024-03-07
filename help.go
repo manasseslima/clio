@@ -4,17 +4,17 @@ import "fmt"
 
 
 func helpHandler(params Params, values Values) {
-	name := params["name"]
-	titleBlk := fmt.Sprintf("%s\n\n", name)
+	usage := params["usage"]
+	titleBlk := fmt.Sprintf("%s\n\n", usage)
 	print(titleBlk)
-	usageBlk := fmt.Sprintf("Usage:\n\n\t\t%s <command> [arguments]\n\n", name)
+	usageBlk := fmt.Sprintf("Usage:\n\n\t%s <command> [arguments]\n\n", usage)
 	print(usageBlk)
 	cmdBlk := "Commands:\n\n"
 	for k, v := range params {
-		if k == name {
+		if k == "name" || k == "usage" {
 			continue
 		}
-		prm := fmt.Sprintf("\t\t%s\t\t%s\n", k, v)
+		prm := fmt.Sprintf("\t%s\t\t%s\n", k, v)
 		cmdBlk = cmdBlk + prm
 	}
 	cmdBlk = cmdBlk + "\n\n"
@@ -22,10 +22,15 @@ func helpHandler(params Params, values Values) {
 }
 
 
-func createHelpCommand(app *App) {
-	hlpCmd := NewCommand("help", helpHandler)
+func createHelpCommandApp(app *App) {
+	hlpCmd := newCommandWithoutHelp("help", "Print this help text", helpHandler)
 	hlpCmd.params["name"] = app.name
-	for k, v := range app.commands {
-		hlpCmd.params[k] = v.description
-	}
+	app.commands["help"] = hlpCmd
+}
+
+func createHelpCommandCmd(cmd *Command) {
+	hlpCmd := newCommandWithoutHelp("help", "Print this help text", helpHandler)
+	hlpCmd.params["name"] = cmd.name
+	hlpCmd.params["usage"] = cmd.usage
+	cmd.commands["help"] = hlpCmd
 }

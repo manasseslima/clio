@@ -14,17 +14,29 @@ type handler func(Params, Values)
 type Command struct {
 	name string
 	description string
+	usage string
 	handler handler
-	commands map[string]Command
+	commands map[string]*Command
 	params map[string]string
 	values []string
 }
 
-func NewCommand(name string, handler handler) *Command {
+func NewCommand(name string, description string, handler handler) *Command {
+	cmd := newCommandWithoutHelp(name, description, handler)
+	cmd.usage = name
+	createHelpCommandCmd(cmd)
+	for k, v := range cmd.commands {
+		cmd.commands["help"].params[k] = v.description 
+	}
+	return cmd
+}
+
+func newCommandWithoutHelp(name string, description string, handler handler) *Command {
 	cmd := &Command{
 		name: name, 
+		description: description,
 		handler: handler,
-		commands: map[string]Command{},
+		commands: map[string]*Command{},
 		params: map[string]string{},
 		values: []string{},
 	}
