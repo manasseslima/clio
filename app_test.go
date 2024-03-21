@@ -10,7 +10,7 @@ func infoHandlerTest(params Params, values Values) {
 
 func createNewApp() *App {
 	app := NewApp("test", "Application for test clio applications")
-	app.AddCmd("info", "Print information of application", infoHandlerTest)
+	app.NewCmd("info", "Print information of application", infoHandlerTest)
 	app.Commands["info"].Params["name"] = "name"
 	return &app
 }

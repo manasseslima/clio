@@ -45,7 +45,7 @@ func (app *App) NewCmd(
 
 func (app *App) AddCmd(cmd *Command) {
 	app.Commands[cmd.Name] = cmd
-)
+}
 
 func (app *App) GetCmd(path string) *Command {
 	spt := strings.Split(path, " ")
