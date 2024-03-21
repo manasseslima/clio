@@ -12,33 +12,33 @@ type handler func(Params, Values)
 
 
 type Command struct {
-	name string
-	description string
-	usage string
+	Name string
+	Description string
+	Usage string
 	handler handler
-	commands map[string]*Command
-	params map[string]string
-	values []string
+	Commands map[string]*Command
+	Params map[string]string
+	Values []string
 }
 
 func NewCommand(name string, description string, handler handler) *Command {
 	cmd := newCommandWithoutHelp(name, description, handler)
-	cmd.usage = name
+	cmd.Usage = name
 	createHelpCommandCmd(cmd)
-	for k, v := range cmd.commands {
-		cmd.commands["help"].params[k] = v.description 
+	for k, v := range cmd.Commands {
+		cmd.Commands["help"].Params[k] = v.Description 
 	}
 	return cmd
 }
 
 func newCommandWithoutHelp(name string, description string, handler handler) *Command {
 	cmd := &Command{
-		name: name, 
-		description: description,
+		Name: name, 
+		Description: description,
 		handler: handler,
-		commands: map[string]*Command{},
-		params: map[string]string{},
-		values: []string{},
+		Commands: map[string]*Command{},
+		Params: map[string]string{},
+		Values: []string{},
 	}
 	return cmd
 }
@@ -47,9 +47,9 @@ func (cmd *Command) run(args []string) {
 	runme := true
 	for idx, arg := range args {
 		if idx == 0 && !strings.Contains(arg, "--") {
-			cd := cmd.commands[arg]
+			cd := cmd.Commands[arg]
 			if cd == nil {
-				cd = cmd.commands["help"]
+				cd = cmd.Commands["help"]
 				cd.run([]string{})
 			} else {
 				cd.run(args[idx + 1:])
@@ -61,12 +61,12 @@ func (cmd *Command) run(args []string) {
 			param := strings.Split(arg[2:], "=")
 			key := param[0]
 			value := param[1]
-			cmd.params[key] = value
+			cmd.Params[key] = value
 		} else {
-			cmd.values = append(cmd.values, arg)
+			cmd.Values = append(cmd.Values, arg)
 		}
 	}
 	if runme {
-		cmd.handler(cmd.params, cmd.values)
+		cmd.handler(cmd.Params, cmd.Values)
 	}
 }

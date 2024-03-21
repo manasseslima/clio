@@ -24,13 +24,13 @@ func helpHandler(params Params, values Values) {
 
 func createHelpCommandApp(app *App) {
 	hlpCmd := newCommandWithoutHelp("help", "Print this help text", helpHandler)
-	hlpCmd.params["name"] = app.name
-	app.commands["help"] = hlpCmd
+	hlpCmd.Params["name"] = app.Name
+	app.Commands["help"] = hlpCmd
 }
 
 func createHelpCommandCmd(cmd *Command) {
 	hlpCmd := newCommandWithoutHelp("help", "Print this help text", helpHandler)
-	hlpCmd.params["name"] = cmd.name
-	hlpCmd.params["usage"] = cmd.usage
-	cmd.commands["help"] = hlpCmd
+	hlpCmd.Params["name"] = cmd.Name
+	hlpCmd.Params["usage"] = cmd.Usage
+	cmd.Commands["help"] = hlpCmd
 }

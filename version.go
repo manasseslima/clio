@@ -12,7 +12,7 @@ func versionHandler(params Params, values Values) {
 
 func createVersionCommand(app *App) {
 	verCmd := NewCommand("version", "Print application version", versionHandler)
-	verCmd.params["name"] = app.name
-	verCmd.params["version"] = "v0.0.0"
-	app.commands[verCmd.name] = verCmd
+	verCmd.Params["name"] = app.Name
+	verCmd.Params["version"] = "v0.0.0"
+	app.Commands[verCmd.Name] = verCmd
 }

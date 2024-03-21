@@ -8,23 +8,23 @@ import (
 
 
 type App struct {
-	name string
-	description string
-	commands map[string]*Command
+	Name string
+	Description string
+	Commands map[string]*Command
 }
 
 func NewApp(name string, description string) App {
 	app := App{
-		name: name, 
-		description: description,
-		commands: map[string]*Command{},
+		Name: name, 
+		Description: description,
+		Commands: map[string]*Command{},
 	}
 	createVersionCommand(&app)
 	createHelpCommandApp(&app)
-	for k, v := range app.commands {
-		app.commands["help"].params[k] = v.description 
+	for k, v := range app.Commands {
+		app.Commands["help"].Params[k] = v.Description 
 	}
-	app.commands["help"].params["usage"] = app.name
+	app.Commands["help"].Params["usage"] = app.Name
 	return app
 }
 
@@ -34,13 +34,29 @@ func (app *App) AddCmd(
 	handler handler,
 ) {
 	cmd := NewCommand(name, description, handler)
-	cmd.usage = fmt.Sprintf("%s %s", app.name, name)
-	params := cmd.commands["help"].params
-	params["usage"] = cmd.usage
-	cmd.commands["help"].params = params
-	app.commands[cmd.name] = cmd
-	hlpCmd := app.commands["help"]
-	hlpCmd.params[name] = description
+	cmd.Usage = fmt.Sprintf("%s %s", app.Name, name)
+	params := cmd.Commands["help"].Params
+	params["usage"] = cmd.Usage
+	cmd.Commands["help"].Params = params
+	app.Commands[cmd.Name] = cmd
+	hlpCmd := app.Commands["help"]
+	hlpCmd.Params[name] = description
+}
+
+func (app *App) GetCmd(path string) *Command {
+	spt := strings.Split(path, " ")
+	cmds :=  app.Commands
+	var cur *Command
+	for idx, scmd := range spt {
+		cur = cmds[scmd]
+		if cur == nil {
+			return nil
+		}
+		if idx != len(spt) - 1 {
+			cmds = cur.Commands
+		}
+	}
+	return cur
 }
 
 func (app *App) Run() {
@@ -55,9 +71,9 @@ func (app *App) Run() {
 			value := param[1]
 			print(key, value)
 		} else {
-			cmd := app.commands[arg]
+			cmd := app.Commands[arg]
 			if cmd == nil {
-				cmd = app.commands["help"]
+				cmd = app.Commands["help"]
 				cmd.run([]string{})
 			} else {
 				cmd.run(args[idx + 1:])
