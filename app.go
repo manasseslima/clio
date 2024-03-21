@@ -28,7 +28,7 @@ func NewApp(name string, description string) App {
 	return app
 }
 
-func (app *App) AddCmd(
+func (app *App) NewCmd(
 	name string,
 	description string,
 	handler handler,
@@ -42,6 +42,10 @@ func (app *App) AddCmd(
 	hlpCmd := app.Commands["help"]
 	hlpCmd.Params[name] = description
 }
+
+func (app *App) AddCmd(cmd *Command) {
+	app.Commands[cmd.Name] = cmd
+)
 
 func (app *App) GetCmd(path string) *Command {
 	spt := strings.Split(path, " ")
