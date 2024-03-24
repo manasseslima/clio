@@ -4,15 +4,20 @@ import "fmt"
 
 
 func versionHandler(params Params, values Values) {
-	name := params["name"]
-	version := params["version"]
+	name := params["name"].Value
+	version := params["version"].Value
 	ver := fmt.Sprintf("%s %s\n", name, version)
 	print(ver)
 }
 
 func createVersionCommand(app *App) {
 	verCmd := NewCommand("version", "Print application version", versionHandler)
-	verCmd.Params["name"] = app.Name
-	verCmd.Params["version"] = "v0.0.0"
+	var param Param
+	param = NewParam("name", "name", false)
+	param.Value = app.Name
+	verCmd.Params["name"] = param
+	param = NewParam("version", "version", false)
+	param.Value = "v0.0.0"
+	verCmd.Params["version"] = param
 	app.Commands[verCmd.Name] = verCmd
 }

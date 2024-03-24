@@ -5,8 +5,26 @@ import (
 	"strings"
 )
 
+type Param struct {
+	Name string 
+	Description string
+	Type string
+	Required bool
+	Value any
+}
 
-type Params map[string]string
+func NewParam(name string, description string, required bool) Param {
+	param := Param{
+		Name: name,
+		Description: description,
+		Type: "str",
+		Required: required,
+		Value: nil,
+	}
+	return param
+}
+
+type Params map[string]Param
 type Values []string
 type handler func(Params, Values)
 
@@ -17,8 +35,8 @@ type Command struct {
 	Usage string
 	handler handler
 	Commands map[string]*Command
-	Params map[string]string
-	Values []string
+	Params Params
+	Values Values
 }
 
 func NewCommand(name string, description string, handler handler) *Command {
@@ -26,7 +44,9 @@ func NewCommand(name string, description string, handler handler) *Command {
 	cmd.Usage = name
 	createHelpCommandCmd(cmd)
 	for k, v := range cmd.Commands {
-		cmd.Commands["help"].Params[k] = v.Description 
+		param := NewParam(k, v.Description, false)
+		param.Value = v.Description
+		cmd.Commands["help"].Params[k] = param
 	}
 	return cmd
 }
@@ -37,10 +57,25 @@ func newCommandWithoutHelp(name string, description string, handler handler) *Co
 		Description: description,
 		handler: handler,
 		Commands: map[string]*Command{},
-		Params: map[string]string{},
+		Params: Params{},
 		Values: []string{},
 	}
 	return cmd
+}
+
+func (cmd *Command) NewParam(name string, description string, required bool, typee string) {
+	param := Param{
+		Name: name,
+		Description: description,
+		Type: typee,
+		Required: required,
+		Value: nil,
+	}
+	cmd.Params[param.Name] = param
+}
+
+func (cmd *Command) AddParam(param Param) {
+	cmd.Params[param.Name] = param
 }
 
 func (cmd *Command) run(args []string) {
@@ -58,10 +93,12 @@ func (cmd *Command) run(args []string) {
 			break
 		}
 		if strings.Index(arg, "--") == 0 {
-			param := strings.Split(arg[2:], "=")
-			key := param[0]
-			value := param[1]
-			cmd.Params[key] = value
+			splt := strings.Split(arg[2:], "=")
+			key := splt[0]
+			value := splt[1]
+			param := cmd.Params[key]
+			param.Value = value
+			cmd.Params[key] = param
 		} else {
 			cmd.Values = append(cmd.Values, arg)
 		}

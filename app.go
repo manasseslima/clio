@@ -22,9 +22,13 @@ func NewApp(name string, description string) App {
 	createVersionCommand(&app)
 	createHelpCommandApp(&app)
 	for k, v := range app.Commands {
-		app.Commands["help"].Params[k] = v.Description 
+		param := NewParam(k, v.Description, false)
+		param.Value = v.Description
+		app.Commands["help"].Params[k] = param
 	}
-	app.Commands["help"].Params["usage"] = app.Name
+	param := NewParam("usage", "Usage", false)
+	param.Value = app.Name
+	app.Commands["help"].AddParam(param)
 	return app
 }
 
@@ -39,12 +43,14 @@ func (app *App) NewCmd(
 
 func (app *App) addHelpCommand(cmd *Command) {
 	cmd.Usage = fmt.Sprintf("%s %s", app.Name, cmd.Name)
-	params := cmd.Commands["help"].Params
-	params["usage"] = cmd.Usage
-	cmd.Commands["help"].Params = params
+	var param Param
+	param = NewParam("usage", "usage", false)
+	param.Value = cmd.Usage
+	cmd.Commands["help"].AddParam(param)
 	app.Commands[cmd.Name] = cmd
-	hlpCmd := app.Commands["help"]
-	hlpCmd.Params[cmd.Name] = cmd.Description
+	param = NewParam(cmd.Name, cmd.Name, false)
+	param.Value = cmd.Description
+	app.Commands["help"].AddParam(param)
 }
 
 func (app *App) AddCmd(cmd *Command) {
