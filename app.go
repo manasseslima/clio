@@ -34,17 +34,21 @@ func (app *App) NewCmd(
 	handler handler,
 ) {
 	cmd := NewCommand(name, description, handler)
-	cmd.Usage = fmt.Sprintf("%s %s", app.Name, name)
+	app.addHelpCommand(cmd)
+}
+
+func (app *App) addHelpCommand(cmd *Command) {
+	cmd.Usage = fmt.Sprintf("%s %s", app.Name, cmd.Name)
 	params := cmd.Commands["help"].Params
 	params["usage"] = cmd.Usage
 	cmd.Commands["help"].Params = params
 	app.Commands[cmd.Name] = cmd
 	hlpCmd := app.Commands["help"]
-	hlpCmd.Params[name] = description
+	hlpCmd.Params[cmd.Name] = cmd.Description
 }
 
 func (app *App) AddCmd(cmd *Command) {
-	app.Commands[cmd.Name] = cmd
+	app.addHelpCommand(cmd)
 }
 
 func (app *App) GetCmd(path string) *Command {
